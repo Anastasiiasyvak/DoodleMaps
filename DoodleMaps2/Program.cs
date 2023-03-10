@@ -13,20 +13,101 @@ var generator = new MapGenerator(new MapGeneratorOptions()
 // кома вказує на те що массив є двовимірним string[,] всі елементи масиву мають тип строки
 string[,] map = generator.Generate();
 List<Point> track = new List<Point>();
+var distances = new Dictionary<Point, int>();
+var origins = new Dictionary<Point, Point>();
+var start = new Point(column: 0, row: 2);
+var goal = new Point(row: 8, column: 9);
+distances[start] = 0;
+// track.Add(start);
+// track.Add(goal);
 
-Point start = new Point(column: 0, row: 2);
-Point goal = new Point(column: 14, row: 8);
-track.Add(start);
-track.Add(new Point(6, 6));
-track.Add(goal);
+
+var my_result = GetPath(map, start, goal);
+
+// new MapPrinter().Print(map, track);
+
+List<Point> GetPath(string[,] map, Point start, Point goal)
+{
+     var path = BFS(start, goal);
+     // List<Point> path = new List<Point>();
+     new MapPrinter().Print(map, path);
+     return path;
+}
 
 
-new MapPrinter().Print(map, track);
+List<Point> BFS(Point start, Point goal)
+{
+     var visited = new List<Point>();
+     var queue = new Queue<Point>();
+     List<Point> path = new List<Point>();
+     
+     queue.Enqueue(start);
+     Visit(start);
+     bool stop = false;
+     while (queue.Count > 0)
+     {
+          var next = queue.Dequeue();
+          var neighbours = GetNeighbours(row:next.Row, column:next.Column, maze:map);
+          foreach (var neighbour in neighbours)
+          {
+               if (!visited.Contains(neighbour))
+               {
+                    origins[neighbour] = next; // next це current точка з якою ми працюємо
+                    distances[neighbour] = distances[next] + 1;
+                    Visit(neighbour);
+                    queue.Enqueue(neighbour);
+                    if (neighbour.Equals(goal))
+                    {
+                         stop = true;
+                    }
+               }
+          }
 
-// List<Point> GetShortestPath(string[,] map, Point start, Point goal)
-// {
-//      List<Point> result = new List<Point>();
-//      return result;
-//      // your code here
-// }
+          if (stop)
+          {
+               
+               path.Add(goal);
+               var next_point = origins[goal];
+               while (!next_point.Equals(start))
+               {
+                    path.Add(next_point);
+                    next_point = origins[next_point];
+               }
+               path.Add(start);
+               break;
+          }
+     }
 
+     return path;
+
+     void Visit(Point point)
+     {
+          //map[point.Column, point.Row] = distances[point].ToString();
+          visited.Add(point);
+     }
+}
+
+
+List<Point> GetNeighbours(int row, int column, string[,] maze)
+{
+     var result = new List<Point>();
+     TryAddWithOffset(1, 0);
+     TryAddWithOffset(-1, 0);
+     TryAddWithOffset(0, 1);
+     TryAddWithOffset(0, -1);
+     return result;
+
+     void TryAddWithOffset(int offsetRow, int offsetColumn)
+     {
+          var newX = row + offsetRow;
+          var newY = column + offsetColumn;
+          if (newX >= 0 && newY>= 0 && newX < maze.GetLength(0) && newY < maze.GetLength(1) && maze[newY, newX] != "█")
+          {
+               result.Add(new Point(newY, newX));
+          }
+     }
+          
+
+
+
+}
