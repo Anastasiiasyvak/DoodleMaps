@@ -9,7 +9,6 @@
         // track список координат точок, через які проходять шлях
         public void Print(string[,] maze, List<Point> path)  
         {
-            PrintTopLine();
             var start = path[0]; // координати стартової точки
             var goal = path[^1];  // повертає останній символ із списку track
             PrintTopLine(); // метод який відображає відступи для кожного рядка, зокрема- координати верхньої лінії
@@ -23,21 +22,19 @@
                     {
                         Console.Write('B');
                     }
-                        else if (goal.Equals(cur_point))
-                        {
+                    else if (goal.Equals(cur_point))
+                    {
                         Console.Write('A');
-                        }
-                            else if (path.Contains(cur_point))
-                            {
-                                Console.Write(".");
-                            }
-                            else
-                            {
-                                Console.Write(maze[column, row]);
-                            }
-
+                    }
+                    else if (path.Contains(cur_point))
+                    {
+                        Console.Write(".");
+                    }
+                    else
+                    {
+                        Console.Write(maze[column, row]);
+                    }
                 }
-
                 Console.WriteLine("");
             }
 

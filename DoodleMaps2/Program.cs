@@ -3,8 +3,8 @@ using Kse.Algorithms.Samples;
 // MapGenerator клас, а MapGeneratorOptions це об'єкт через який передається ширина і довжина 
 var generator = new MapGenerator(new MapGeneratorOptions()
 {
-     Height = 10,
-     Width = 15,
+     Height = 16,
+     Width = 24,
      Seed = 3, // якщо не задавати seed то карта буде кожен раз різна 
      Noise = 0.1f // стінки наші, самий плотний це 0 і до 1 можна обирати
 });
@@ -16,11 +16,10 @@ List<Point> track = new List<Point>();
 var distances = new Dictionary<Point, int>();
 var origins = new Dictionary<Point, Point>();
 var start = new Point(column: 0, row: 2);
-var goal = new Point(row: 8, column: 9);
+var goal = new Point(row: 8, column: 12);
 distances[start] = 0;
 // track.Add(start);
 // track.Add(goal);
-
 
 var my_result = GetPath(map, start, goal);
 
@@ -34,13 +33,11 @@ List<Point> GetPath(string[,] map, Point start, Point goal)
      return path;
 }
 
-
 List<Point> BFS(Point start, Point goal)
 {
      var visited = new List<Point>();
      var queue = new Queue<Point>();
      List<Point> path = new List<Point>();
-     
      queue.Enqueue(start);
      Visit(start);
      bool stop = false;
@@ -62,10 +59,8 @@ List<Point> BFS(Point start, Point goal)
                     }
                }
           }
-
           if (stop)
           {
-               
                path.Add(goal);
                var next_point = origins[goal];
                while (!next_point.Equals(start))
@@ -77,16 +72,14 @@ List<Point> BFS(Point start, Point goal)
                break;
           }
      }
-
      return path;
-
+     
      void Visit(Point point)
      {
           //map[point.Column, point.Row] = distances[point].ToString();
           visited.Add(point);
      }
 }
-
 
 List<Point> GetNeighbours(int row, int column, string[,] maze)
 {
@@ -101,13 +94,9 @@ List<Point> GetNeighbours(int row, int column, string[,] maze)
      {
           var newX = row + offsetRow;
           var newY = column + offsetColumn;
-          if (newX >= 0 && newY>= 0 && newX < maze.GetLength(0) && newY < maze.GetLength(1) && maze[newY, newX] != "█")
+          if (newX >= 0 && newY>= 0 && newX < maze.GetLength(1) && newY < maze.GetLength(0) && maze[newY, newX] != "█")
           {
                result.Add(new Point(newY, newX));
           }
      }
-          
-
-
-
 }
