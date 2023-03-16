@@ -6,7 +6,9 @@ var generator = new MapGenerator(new MapGeneratorOptions()
      Height = 16,
      Width = 24,
      Seed = 3, // якщо не задавати seed то карта буде кожен раз різна 
-     Noise = 0.1f // стінки наші, самий плотний це 0 і до 1 можна обирати
+     Noise = 0.1f, // стінки наші, самий плотний це 0 і до 1 можна обирати
+     AddTraffic = true,
+     TrafficSeed = 1234
 });
 // Generate використовується для створення двовимірного масиву 
 // Print друкує мапу 
@@ -16,7 +18,7 @@ List<Point> track = new List<Point>();
 var distances = new Dictionary<Point, int>();
 var origins = new Dictionary<Point, Point>();
 var start = new Point(column: 0, row: 2);
-var goal = new Point(row: 8, column: 12);
+var goal = new Point(row: 9, column: 1);
 distances[start] = 0;
 // track.Add(start);
 // track.Add(goal);
@@ -41,6 +43,7 @@ List<Point> BFS(Point start, Point goal)
      queue.Enqueue(start);
      Visit(start);
      bool stop = false;
+     var totalTime = 0; // лічильник сумарного часу подорожі
      while (queue.Count > 0)
      {
           var next = queue.Dequeue();
@@ -50,7 +53,7 @@ List<Point> BFS(Point start, Point goal)
                if (!visited.Contains(neighbour))
                {
                     origins[neighbour] = next; // next це current точка з якою ми працюємо
-                    distances[neighbour] = distances[next] + 1;
+                    distances[neighbour] = distances[next] + GetDistance(next, neighbour);
                     Visit(neighbour);
                     queue.Enqueue(neighbour);
                     if (neighbour.Equals(goal))
@@ -66,20 +69,23 @@ List<Point> BFS(Point start, Point goal)
                while (!next_point.Equals(start))
                {
                     path.Add(next_point);
+                    totalTime += GetDistance(next_point, origins[next_point]); // додаємо час до лічильника
                     next_point = origins[next_point];
                }
                path.Add(start);
+               totalTime += GetDistance(start, next); // додаємо час від початку до першої точки маршруту
                break;
           }
      }
+     Console.WriteLine($"Total time: {totalTime} minutes"); // виводимо сумарний час
      return path;
      
      void Visit(Point point)
      {
-          //map[point.Column, point.Row] = distances[point].ToString();
           visited.Add(point);
      }
 }
+
 
 List<Point> GetNeighbours(int row, int column, string[,] maze)
 {
@@ -99,4 +105,15 @@ List<Point> GetNeighbours(int row, int column, string[,] maze)
                result.Add(new Point(newY, newX));
           }
      }
+}
+
+int GetDistance(Point next, Point neighbour)
+{
+     int traffic = 0;
+     if (int.TryParse(map[neighbour.Row, next.Column], out int result))
+     {
+          traffic = result;
+     }
+     int speed = 60 - (traffic - 1) * 6;
+     return 1 * 60 / speed;
 }
