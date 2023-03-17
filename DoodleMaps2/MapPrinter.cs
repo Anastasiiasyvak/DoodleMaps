@@ -5,14 +5,11 @@
 
     public class MapPrinter
     {
-        // maze двовимірний масив рядків, представляє карту лабіринта 
-        // path список координат точок, через які проходять шлях
-        // метод Print
         public void Print(string[,] maze, List<Point> path)
         {
-            PrintTopLine();
-            var start = path[0];
-            var goal = path[^1];
+            var start = path[0]; 
+            var goal = path[^1]; 
+            PrintTopLine(); 
             for (var row = 0; row < maze.GetLength(1); row++)
             {
                 Console.Write($"{row}\t"); // формує рядок який містить номер рядка
@@ -35,7 +32,6 @@
                     {
                         Console.Write(maze[column, row]);
                     }
-
                 }
 
                 Console.WriteLine("");
